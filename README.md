@@ -12,15 +12,44 @@ Board used is:
 
 # Connections
 
-| BNO055            | STM32 Pin   |
-|-------------------|-------------|
-| SCL               | PB10        |
-| SDA               | PB11        |
-| GND               | GND         |
-| VIN               | 3V          |
+<table>
+    <tr>
+        <th>BNO055</th>
+        <th>STM32 Pin</th>
+    </tr>
+    <tr>
+        <td>SCL</td>
+        <td>PB10</td>
+    </tr>
+    <tr>
+        <td>SDA</td>
+        <td>PB11</td>
+    </tr>
+    <tr>
+        <td>GND</td>
+        <td>GND</td>
+    </tr>
+    <tr>
+        <td>VIN</td>
+        <td>3V</td>
+    </tr>
+</table>
 
-| STM32 Pin         | ESP32       |
-|-------------------|-------------|
-| PA2(UART2 TX)     | GPIO3 (RX)  |
-| PA3(UART2 RX)     | GPIO1 (TX)  |
+&nbsp; 
+
+<table>
+    <tr>
+        <th>STM32 Pin</th>
+        <th>ESP32</th>
+    </tr>
+    <tr>
+        <td>PA2 (UART2 TX)</td>
+        <td>GPIO3 (RX)</td>
+    </tr>
+    <tr>
+        <td>PA3 (UART2 RX)</td>
+        <td>GPIO1 (TX)</td>
+    </tr>
+</table>
+
 
