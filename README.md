@@ -1,6 +1,7 @@
 # Madgwick Algorithm implementation with Bosch's Bno055 sensor
 Quaternion Based Attitude Estimation Using Bno055 and STM32F407
 ![](./img/Proposal.gif)
+
 [DEMO](https://www.youtube.com/watch?v=e6xahf8quOc)
 
 # Hardware
