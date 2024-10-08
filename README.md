@@ -9,3 +9,18 @@ Board used is:
 
 # Circuit:
 ![](./img/circuit.jfif)
+
+# Connections
+
+| BNO055            | STM32 Pin   |
+|-------------------|-------------|
+| SCL               | PB10        |
+| SDA               | PB11        |
+| GND               | GND         |
+| VIN               | 3V          |
+
+| STM32 Pin         | ESP32       |
+|-------------------|-------------|
+| PA2(UART2 TX)     | GPIO3 (RX)  |
+| PA3(UART2 RX)     | GPIO1 (TX)  |
+
