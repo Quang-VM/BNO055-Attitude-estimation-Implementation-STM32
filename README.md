@@ -2,15 +2,13 @@
 Quaternion Based Attitude Estimation Using Bno055 and STM32F407
 ![](./img/Proposal.gif)
 
-Board used is:
+# Hardware
 - [STM32F407G-DISC1](https://www.st.com/en/evaluation-tools/stm32f4discovery.html)
 
 - [ESP32](https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32e_esp32-wroom-32ue_datasheet_en.pdf) streaming data over serial instead of using USB-to-Serial Converter
 
-# Circuit:
+- [BNO055](https://www.bosch-sensortec.com/products/smart-sensor-systems/bno055/) (probably made in China)
 ![](./img/circuit.jfif)
-
-# Connections
 
 # Connections
 
@@ -21,4 +19,10 @@ Board used is:
 | GND               | GND         |   |                   |             |
 | VIN               | 3V          |   |                   |             |
 
+# Frame Representation
+To change the frame to ENU Frame, in Sensor_Init() function set:
+```
+handle_bno055.Frame = ENU_FRAME;				
+```in order to config the frame of BNO055 and Madgwick Algorithm also.
 
+# Madgwick Algorithm
