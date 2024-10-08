@@ -1,6 +1,7 @@
 # Madgwick Algorithm implementation with Bosch's Bno055 sensor
 Quaternion Based Attitude Estimation Using Bno055 and STM32F407
 ![](./img/Proposal.gif)
+[DEMO](https://www.youtube.com/watch?v=e6xahf8quOc)
 
 # Hardware
 - [STM32F407G-DISC1](https://www.st.com/en/evaluation-tools/stm32f4discovery.html)
@@ -61,3 +62,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 ![](./img/raw_cali_magnetometer.png)
 
+* Update the 3x1 bias matrix (B) and the 3x3 inverse scale factor matrix (A⁻¹) on the STM32 side
+```
+// Magnetic bias vector
+float Mag_Bias[3] = {69.127276f, -59.899396f, 161.283932f};
+
+// Magnetic scaling factor matrix
+float Mag_ScFactor[3][3] = {
+    {1.102381f, 0.021149f, 0.032939f},
+    {0.021149f, 1.007658f, -0.108953f},
+    {0.032939f, -0.108953f, 1.119184f}
+};
+```
+
+# BNO055's Automatic Background Calibration
