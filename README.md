@@ -23,6 +23,12 @@ Quaternion Based Attitude Estimation Using Bno055 and STM32F407
 To change the frame to ENU Frame, in Sensor_Init() function set:
 ```
 handle_bno055.Frame = ENU_FRAME;				
-```in order to config the frame of BNO055 and Madgwick Algorithm also.
+```
+in order to config the frame of BNO055 and Madgwick Algorithm also.
 
 # Madgwick Algorithm
+* The first estimation was calculated by ecompass() function (Accelerometer and Magnetometer Fusion)
+* Delta time (default 0.0125s (80 Hz) -> use a timer interrupt)
+    - To calculate the required delta time use the `timer_period_calculation.xlsx` file and change the parameters in TIMER6_Init() with this results
+
+
