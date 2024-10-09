@@ -283,7 +283,7 @@ void TIMER6_Init(void)
 {
 	htimer6.Instance = TIM6;
 	htimer6.Init.Prescaler = 5999;
-	htimer6.Init.Period = 125-1;			//interrupt every 0.02s (50hz)
+	htimer6.Init.Period = 125-1;			//interrupt every 0.0125s (80hz)
 	if( HAL_TIM_Base_Init(&htimer6) != HAL_OK )
 	{
 		SERIAL_Printf("Error with Timer6 initialization \r\n");
@@ -357,9 +357,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				   	    &yaw_mad, &pitch_mad, &roll_mad);
 
 		   len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
-				   	   	   yaw_mad,   // Yaw
-						   roll_mad,  // Pitch
-						   pitch_mad); // Roll
+				   	   	   yaw_mad,   
+						   roll_mad,  
+						   pitch_mad); 
 		   SERIAL_Printf(msg);
 
 		}
