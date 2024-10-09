@@ -161,7 +161,7 @@ len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
 				BNO055.Euler.X); 
 SERIAL_Printf(msg);
 ```
- - if Quaternion output:
+ 	- if Quaternion output:
 ```
 ReadData(&BNO055, SENSOR_QUATERNION);    
 len = snprintf(msg, sizeof(msg), "%f,%f,%f,%f\n",
