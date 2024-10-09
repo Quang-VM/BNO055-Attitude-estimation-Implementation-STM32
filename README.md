@@ -133,8 +133,7 @@ void Sensor_Init(void){
 	SERIAL_Printf("System Error: %d\n",Status.SYSError);
 }
 ```
-The Calibrate_BNO055() function returns True if the CALIB_STAT values for the system, gyroscope, accelerometer, and magnetometer are fully calibrated (calibration accuracy level 3).
-Details the [calibration instruction](https://www.youtube.com/watch?v=Bw0WuAyGsnY&t=92s) provided by Bosch.
+The Calibrate_BNO055() function returns True if the CALIB_STAT values for the system, gyroscope, accelerometer, and magnetometer are fully calibrated (calibration accuracy level 3). Details the [calibration instruction](https://www.youtube.com/watch?v=Bw0WuAyGsnY&t=92s) provided by Bosch.
 * Acceleration Calibration
 	- Place the device in 6 different stable positions for a period of few seconds to allow the accelerometer to calibrate.
 	- Make sure that there is slow movement between 2 stable positions.
@@ -146,6 +145,35 @@ Details the [calibration instruction](https://www.youtube.com/watch?v=Bw0WuAyGsn
 
 The BNO055 sensor must be calibrated each time it is turned on, or the offset data obtained after calibration must be stored in the offset registers. After calibrating the sensor, store the offset data in the `OffsetDatas` buffer, then remove the `setSensorOffsets(OffsetDatas);` function from comment line and add calibration part in the comment line.
 # Embedded Sensor Fusion Algorithm Of the Bno055
+To get the embedded sensor fusion algorithm output modify source code as follow:
+* Change Op_Mode to NDOF and config the unit:
+```
+handle_bno055.OP_Mode = NDOF;					// Sensor Fusion mode
+handle_bno055.Unit_Sel = (UNIT_ORI_ANDROID | UNIT_TEMP_CELCIUS | UNIT_EUL_DEG | UNIT_GYRO_RPS | UNIT_ACC_MS2);
+```
+* Modify the Timer Callback function:
+```
+//if Euler angles output:
+ReadData(&BNO055, SENSOR_EULER);    
+len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
+				BNO055.Euler.Z,   
+				BNO055.Euler.Y,  
+				BNO055.Euler.X); 
+SERIAL_Printf(msg);
+```
+```
+//if Quaternion output:
+ReadData(&BNO055, SENSOR_QUATERNION);    
+len = snprintf(msg, sizeof(msg), "%f,%f,%f,%f\n",
+				BNO055.Quaternion.W,   
+				BNO055.Quaternion.X,  
+				BNO055.Quaternion.Y,
+				BNO055.Quaternion.Z); 
+SERIAL_Printf(msg);
+```
+
+
+
 
 
 
