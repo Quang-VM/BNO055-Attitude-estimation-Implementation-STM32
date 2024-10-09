@@ -133,7 +133,7 @@ void Sensor_Init(void){
 	SERIAL_Printf("System Error: %d\n",Status.SYSError);
 }
 ```
-The Calibrate_BNO055() function returns True if the CALIB_STAT values for the system, gyroscope, accelerometer, and magnetometer are fully calibrated (calibration accuracy level 3). Details the [calibration instruction](https://www.youtube.com/watch?v=Bw0WuAyGsnY&t=92s) provided by Bosch.
+The Calibrate_BNO055() function returns True if the CALIB_STAT values for the system, gyroscope, accelerometer, and magnetometer are fully calibrated (calibration accuracy level 3). Details the [calibration instructions](https://www.youtube.com/watch?v=Bw0WuAyGsnY&t=92s) provided by Bosch.
 * Acceleration Calibration
 	- Place the device in 6 different stable positions for a period of few seconds to allow the accelerometer to calibrate.
 	- Make sure that there is slow movement between 2 stable positions.
@@ -145,15 +145,15 @@ The Calibrate_BNO055() function returns True if the CALIB_STAT values for the sy
 
 The BNO055 sensor must be calibrated each time it is turned on, or the offset data obtained after calibration must be stored in the offset registers. After calibrating the sensor, store the offset data in the `OffsetDatas` buffer, then remove the `setSensorOffsets(OffsetDatas);` function from comment line and add calibration part in the comment line.
 # Embedded Sensor Fusion Algorithm Of the Bno055
-To get the embedded sensor fusion algorithm output modify source code as follow:
+To obtain output of the embedded sensor fusion algorithm modify source code as follow:
 * Change Op_Mode to NDOF and config the unit:
 ```
 handle_bno055.OP_Mode = NDOF;					// Sensor Fusion mode
 handle_bno055.Unit_Sel = (UNIT_ORI_ANDROID | UNIT_TEMP_CELCIUS | UNIT_EUL_DEG | UNIT_GYRO_RPS | UNIT_ACC_MS2);
 ```
 * Modify the Timer Callback function:
+	- if Euler angles output:
 ```
-//if Euler angles output:
 ReadData(&BNO055, SENSOR_EULER);    
 len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
 				BNO055.Euler.Z,   
@@ -161,8 +161,8 @@ len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
 				BNO055.Euler.X); 
 SERIAL_Printf(msg);
 ```
+ - if Quaternion output:
 ```
-//if Quaternion output:
 ReadData(&BNO055, SENSOR_QUATERNION);    
 len = snprintf(msg, sizeof(msg), "%f,%f,%f,%f\n",
 				BNO055.Quaternion.W,   
@@ -171,7 +171,19 @@ len = snprintf(msg, sizeof(msg), "%f,%f,%f,%f\n",
 				BNO055.Quaternion.Z); 
 SERIAL_Printf(msg);
 ```
+# Data Visualization
+* Data Transmission via UART:
+The SERIAL_Printf() function transmits output data through the UART protocol to the ESP32. In this example, the ESP32 acts as a UART receiver, and data from the BNO055 sensor is displayed through serial communication.
+* Data Reception on ESP32:
+On the ESP32 side, the device is set up to receive data from the STM32 and display it over the serial monitor. The data received via UART can be visualized through the serial output:
+* Real-Time Visualization:
+ - Line Graph Visualization: To plot the received sensor data as a line graph, use the `Serial_plot.py` script. This script dynamically plots data in real time as it is received over the serial port. Make sure to adjust the Num_Vals variable in the script to match the number of values you are expecting to plot (the default is set to 4). Valid format `%f,%f,%f\n"
 
+ Example command to run the script:
+ ```
+ python Serial_plot.py --port COM19	# Replace with your COM port
+ ```
+ - 3D Body Visualization: The `3dBody.py` script can be used to create a 3D visualization of the orientation of the device based on the euler angles data received from the BNO055 sensor. Change the. Valid format `%f,%f,%f\n`. You can modify the COM port and baud rate (COM19, 115200) to match your setup.
 
 
 
