@@ -11,8 +11,6 @@ Quaternion Based Attitude Estimation Using Bno055 and STM32F407
 
 - [BNO055](https://www.bosch-sensortec.com/products/smart-sensor-systems/bno055/) (probably made in China)
 
-![](./img/circuit.jfif)
-
 # Connections
 
 | BNO055            | STM32 Pin   |   | STM32 Pin         | ESP32       |
@@ -93,3 +91,62 @@ Madgwick_Update(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
 ```
 
 # BNO55 Calibration
+To calibrate Bno055, modify Sensor_Init function as follow:
+```
+//uint8_t OffsetDatas[22];
+void Sensor_Init(void){
+
+	// Reset Bno055
+	ResetBno055();
+
+	handle_bno055.ACC_Range = ACC_RANGE_4G;
+	handle_bno055.GYR_Range = GYR_RANGE_1000_DPS;
+	handle_bno055.Frame = NED_FRAME;
+	handle_bno055.Clock_Source = CLOCK_EXTERNAL;		//CLOCK_EXTERNAL or CLOCK_INTERNAL
+	handle_bno055.PWR_Mode = BNO055_NORMAL_MODE;		//BNO055_X_MODE   X:NORMAL, LOWPOWER, SUSPEND
+	handle_bno055.OP_Mode = AMG;						//if the application requires only raw meas, this mode can be chosen.
+	//handle_bno055.OP_Mode = NDOF;						// Sensor Fusion mode
+	//handle_bno055.Unit_Sel = (UNIT_ORI_ANDROID | UNIT_TEMP_CELCIUS | UNIT_EUL_DEG | UNIT_GYRO_RPS | UNIT_ACC_MS2);
+	 handle_bno055.Unit_Sel = ( UNIT_GYRO_RPS | UNIT_ACC_MS2);
+	BNO055_Init(&handle_bno055);
+
+	//------------------BNO055 Calibration------------------
+
+    /*This function enables the calibration offset data gathered after the BNO055 sensor is calibrated to be saved 
+ 	*to its registers. This allows the sensor to retain its calibration settings, eliminating the need for recalibration
+ 	*each time it is powered on.*/
+	//setSensorOffsets(OffsetDatas);
+
+	/*-=-=-=-=-=-=Calibration Part-=-=-=-=-=-=*/
+	if(Calibrate_BNO055())
+	{
+		getSensorOffsets(OffsetDatas);
+	}
+	else
+	{
+		SERIAL_Printf("Sensor calibration failed.\nFailed to retrieve offset data\n");
+	}
+
+	Check_Status(&Status);
+	SERIAL_Printf("Selftest Result: %d\t",Status.STresult);
+	SERIAL_Printf("System Status: %d\t",Status.SYSStatus);
+	SERIAL_Printf("System Error: %d\n",Status.SYSError);
+}
+```
+The Calibrate_BNO055() function returns True if the CALIB_STAT values for the system, gyroscope, accelerometer, and magnetometer are fully calibrated (calibration accuracy level 3).
+Details the [calibration instruction](https://www.youtube.com/watch?v=Bw0WuAyGsnY&t=92s) provided by Bosch.
+* Acceleration Calibration
+	- Place the device in 6 different stable positions for a period of few seconds to allow the accelerometer to calibrate.
+	- Make sure that there is slow movement between 2 stable positions.
+	- The 6 stable positions could be in any direction, but make sure that the device is lying at least once perpendicular to the x, y, and z axis.
+* Gyroscope Calibration
+	- Place the device in a single stable position for a period.
+* Magnetometer Calibration
+	- Make some random movements (for example: writing an 'infinity symbol' on air).
+
+The BNO055 sensor must be calibrated each time it is turned on, or the offset data obtained after calibration must be stored in the offset registers. After calibrating the sensor, store the offset data in the `OffsetDatas` buffer, then remove the `setSensorOffsets(OffsetDatas);` function from comment line and add calibration part in the comment line.
+# Embedded Sensor Fusion Algorithm Of the Bno055
+
+
+
+
