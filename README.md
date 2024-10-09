@@ -177,11 +177,11 @@ The SERIAL_Printf() function transmits output data through the UART protocol to 
 * Data Reception on ESP32:
 On the ESP32 side, the device is set up to receive data from the STM32 and display it over the serial monitor. The data received via UART can be visualized through the serial output:
 * Real-Time Visualization:
-	- Line Graph Visualization: To plot the received sensor data as a line graph, use the `Serial_plot.py` script. This script dynamically plots data in real time as it is received over the serial port. Make sure to adjust the Num_Vals variable in the script to match the number of values you are expecting to plot (the default is set to 4). Valid format `%f,%f,%f\n`
+	- Line Graph Visualization: To plot the received sensor data as a line graph, use the `LinePlot.py` script. This script dynamically plots data in real time as it is received over the serial port. Make sure to adjust the Num_Vals variable in the script to match the number of values you are expecting to plot (the default is set to 4). Valid format `%f,%f,%f\n`
 
 	Example command to run the script:
 	```
-	python Serial_plot.py --port COM19	# Replace with your COM port
+	python LinePlot.py --port COM19	# Replace with your COM port
 	```
 	- 3D Body Visualization: The `3dBody.py` script can be used to create a 3D visualization of the orientation of the device based on the euler angles data received from the BNO055 sensor. Change the. Valid format `%f,%f,%f\n`. You can modify the COM port and baud rate (COM19, 115200) to match your setup.
 
