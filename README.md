@@ -152,7 +152,7 @@ handle_bno055.OP_Mode = NDOF;					// Sensor Fusion mode
 handle_bno055.Unit_Sel = (UNIT_ORI_ANDROID | UNIT_TEMP_CELCIUS | UNIT_EUL_DEG | UNIT_GYRO_RPS | UNIT_ACC_MS2);
 ```
 * Modify the Timer Callback function:
-	- if Euler angles output:
+-If Euler angles output:
 ```
 ReadData(&BNO055, SENSOR_EULER);    
 len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
@@ -161,7 +161,7 @@ len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
 				BNO055.Euler.X); 
 SERIAL_Printf(msg);
 ```
- 	- if Quaternion output:
+-If Quaternion output:
 ```
 ReadData(&BNO055, SENSOR_QUATERNION);    
 len = snprintf(msg, sizeof(msg), "%f,%f,%f,%f\n",
