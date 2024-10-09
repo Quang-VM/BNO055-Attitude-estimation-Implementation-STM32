@@ -35,7 +35,7 @@ in order to config the frame of BNO055 and Madgwick Algorithm also.
     - To calculate the required delta time use the `timer_period_calculation.xlsx` file and change the parameters in TIMER6_Init() with this results
 * Set up the filter Beta gain (default 0.68)
 
-# Raw Measurement and Calibrated
+# Raw Measurement and Calibration
 By default, this implementation uses raw accelerometer and gyroscope data along with custom calibrated magnetometer data.
 To manually calibrate the magnetometer, follow these steps:
 * In the Timer interrupt callback function, modify it as follows:
@@ -50,7 +50,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	        "%f,%f,%f\n",
 			BNO055.Magneto.X, BNO055.Magneto.Y, BNO055.Magneto.Z);  
 	    SERIAL_Printf(msg);
-
     }
 }
 ```
@@ -77,3 +76,20 @@ float Mag_ScFactor[3][3] = {
 ```
 
 # BNO055's Automatic Background Calibration
+The sensor fusion algorithm inside the Bno055 performs automatic background calibration of all sensors and cannot be disabled.
+To get the automatic calibrated data change the Operation Mode to NDOF Mode:
+```
+handle_bno055.OP_Mode = NDOF;					// Sensor Fusion mode
+```
+If you wanna use the Madgwick algorithm with automatic calibrated data change the input of Update function:
+```
+ReadData(&handle_bno055, &BNO055, SENSOR_ACCEL| SENSOR_MAG);
+ecompass(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
+		BNO055.Magneto.X, BNO055.Magneto.Y, BNO055.Magneto.Z);
+
+Madgwick_Update(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
+					BNO055.Gyro.X, BNO055.Gyro.Y, BNO055.Gyro.Z,
+					BNO055.Magneto.X, BNO055.Magneto.Y, BNO055.Magneto.Z);
+```
+
+# BNO55 Calibration
