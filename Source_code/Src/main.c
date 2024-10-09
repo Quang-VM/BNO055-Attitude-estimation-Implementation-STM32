@@ -65,7 +65,7 @@ int main(void)
 
     while(1)
     {
-        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET && start_flag == 0)
+        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET && start_flag == 0) //wait til button(PA0) is pressed
         {
             // Start timer
             HAL_TIM_Base_Start_IT(&htimer6);
