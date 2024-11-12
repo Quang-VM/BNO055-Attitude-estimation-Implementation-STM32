@@ -37,8 +37,7 @@ BNO055_Sensors_t BNO055;
 char msg[200];
 int len = 0;
 
-int start_flag;
-int init_flag;
+uint8_t init_complete_flag = 0;
 
 //Euler
 float yaw_mad, pitch_mad, roll_mad;
@@ -63,23 +62,11 @@ int main(void)
 
 	Magwick_Init();
 
+	init_complete_flag = 1;
+
     while(1)
     {
-        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET && start_flag == 0) //wait til button(PA0) is pressed
-        {
-            // Start timer
-            HAL_TIM_Base_Start_IT(&htimer6);
-            start_flag = 1;
-        }
-
-        if (start_flag == 1)
-        {
-            break;
-        }
     }
-
-	while(1){}
-
 }
 
 /**
@@ -201,9 +188,13 @@ void GPIO_Init(void)
 	HAL_GPIO_Init(GPIOD,&ledgpio);
 
 	btngpio.Pin = GPIO_PIN_0;
-	btngpio.Mode = GPIO_MODE_INPUT;
+	btngpio.Mode = GPIO_MODE_IT_FALLING;
 	btngpio.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA,&btngpio);
+
+	/* EXTI interrupt init*/
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 6, 0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 
@@ -283,7 +274,7 @@ void TIMER6_Init(void)
 {
 	htimer6.Instance = TIM6;
 	htimer6.Init.Prescaler = 5999;
-	htimer6.Init.Period = 125-1;			//interrupt every 0.0125s (80hz)
+	htimer6.Init.Period = 125-1;			//interrupt every 0.02s (50hz)
 	if( HAL_TIM_Base_Init(&htimer6) != HAL_OK )
 	{
 		SERIAL_Printf("Error with Timer6 initialization \r\n");
@@ -306,6 +297,8 @@ void Sensor_Init(void){
 	//handle_bno055.Unit_Sel = (UNIT_ORI_ANDROID | UNIT_TEMP_CELCIUS | UNIT_EUL_DEG | UNIT_GYRO_RPS | UNIT_ACC_MS2);
 	 handle_bno055.Unit_Sel = ( UNIT_GYRO_RPS | UNIT_ACC_MS2);
 	BNO055_Init(&handle_bno055);
+
+
 }
 
 void Magwick_Init(void){
@@ -337,34 +330,40 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htimer6){
 
-		   if (init_flag == 0)
-		   {
-			   ReadData(&handle_bno055, &BNO055, SENSOR_ACCEL| SENSOR_MAG);
-			   ecompass(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
-                       BNO055.Magneto_CAL.X, BNO055.Magneto_CAL.Y, BNO055.Magneto_CAL.Z);
-			   init_flag = 1;
+		   ReadData(&handle_bno055, &BNO055, SENSOR_ACCEL | SENSOR_GYRO | SENSOR_MAG);
 
-		   }else{
-		       ReadData(&handle_bno055, &BNO055, SENSOR_ACCEL | SENSOR_GYRO | SENSOR_MAG);
-
-		       Madgwick_Update(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
+	       Madgwick_Update(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
 		                         BNO055.Gyro.X, BNO055.Gyro.Y, BNO055.Gyro.Z,
 		                         BNO055.Magneto_CAL.X, BNO055.Magneto_CAL.Y, BNO055.Magneto_CAL.Z);
-		   }
 
 		   // Madgwick's algorithm
 		   quat2EUangle(BNO055.Quaternion_MAD.W, BNO055.Quaternion_MAD.X, BNO055.Quaternion_MAD.Y, BNO055.Quaternion_MAD.Z,
 				   	    &yaw_mad, &pitch_mad, &roll_mad);
 
 		   len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
-				   	   	   yaw_mad,   
-						   roll_mad,  
-						   pitch_mad); 
+				   	   	   yaw_mad,   // Yaw
+						   roll_mad,  // Pitch
+						   pitch_mad); // Roll
 		   SERIAL_Printf(msg);
-
 		}
 }
 
+// initial estimation
+void initial_estimate(void)
+{
+	   ReadData(&handle_bno055, &BNO055, SENSOR_ACCEL| SENSOR_MAG);
+	   ecompass(&BNO055, BNO055.Accel.X, BNO055.Accel.Y, BNO055.Accel.Z,
+                BNO055.Magneto_CAL.X, BNO055.Magneto_CAL.Y, BNO055.Magneto_CAL.Z);
+
+	   quat2EUangle(BNO055.Quaternion_MAD.W, BNO055.Quaternion_MAD.X, BNO055.Quaternion_MAD.Y, BNO055.Quaternion_MAD.Z,
+			   	    &yaw_mad, &pitch_mad, &roll_mad);
+
+	   len = snprintf(msg, sizeof(msg), "%f,%f,%f\n",
+			   	   	   yaw_mad,   // Yaw
+					   roll_mad,  // Pitch
+					   pitch_mad); // Roll
+	   SERIAL_Printf(msg);
+}
 
 /**
   * @brief printf by uart protocol Function
